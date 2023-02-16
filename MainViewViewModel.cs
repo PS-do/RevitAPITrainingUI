@@ -51,6 +51,7 @@ namespace RevitAPITrainingUI
                 }
                 ts.Commit();
             }
+            RaiseCloseRequest();
         }
 
         public event EventHandler CloseRequest;
