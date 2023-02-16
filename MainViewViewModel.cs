@@ -21,15 +21,22 @@ namespace RevitAPITrainingUI
             SelectCommand = new DelegateCommand(OnSelectCommand);
         }
 
-        public event EventHandler CloseRequest;
-        private void RaiseCloseRequest()
+        public event EventHandler HideRequest;
+        private void RaiseHideRequest()
         {
-            CloseRequest?.Invoke(this, EventArgs.Empty);
+            HideRequest?.Invoke(this, EventArgs.Empty);
+        }
+
+
+        public event EventHandler ShowRequest;
+        private void RaiseShowRequest()
+        {
+            ShowRequest?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnSelectCommand()
         {
-            RaiseCloseRequest();
+            RaiseHideRequest();
             UIApplication uiapp = _commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
@@ -37,6 +44,8 @@ namespace RevitAPITrainingUI
             Reference selectedObject = uidoc.Selection.PickObject(Autodesk.Revit.UI.Selection.ObjectType.Element, "Выберите элемент");//получаем ссылку на выбранный пользователем элемент
             Element oElement = doc.GetElement(selectedObject.ElementId);//распаковвываем ссылку на элемент
             TaskDialog.Show("Сообщение",$"ID: {oElement.Id}");
+
+            RaiseShowRequest();
         }
     }
 }
