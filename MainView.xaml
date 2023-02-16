@@ -8,9 +8,13 @@
              Height="150" Width="300"
         Title="Идентификатор элемента">
     <StackPanel>
-        <Label Content="Узнать ID элемента"
+        <Label Content="Выбор системы"
                Margin="5"/>
-        <Button Content="Выбрать" Command="{Binding SelectCommand}"
+        <ComboBox ItemsSource="{Binding PipeSystems}"
+                  SelectedValue="{Binding SelectedPipeSystem}"
+                  DisplayMemberPath="Name"
                Margin="5"/>
+        <Button Content="Применить"
+                Command="{Binding SaveCommand}"/>
     </StackPanel>
 </Window>

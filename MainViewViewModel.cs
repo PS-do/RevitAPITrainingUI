@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 using Prism.Commands;
 using RevitAPITrainingLibrary;
@@ -14,35 +16,47 @@ namespace RevitAPITrainingUI
     {
         private ExternalCommandData _commandData;
 
-        public DelegateCommand SelectCommand { get; private set; }
-
+        public DelegateCommand SaveCommand { get; }
+        public List<Element> PickedObjects { get; } = new List<Element>();
+        public List<PipingSystemType> PipeSystems { get; } = new List<PipingSystemType>();
+        public PipingSystemType SelectedPipeSystem { get; set; }
         public MainViewViewModel(ExternalCommandData commandData)
         {
             _commandData = commandData;
-            SelectCommand = new DelegateCommand(OnSelectCommand);
+            SaveCommand = new DelegateCommand(OnSaveCommand);
+            PickedObjects = SelectionUtils.PickObjects(commandData);
+            PipeSystems = PipesUtils.GetPipeSystems(commandData);
+            
         }
-
-        public event EventHandler HideRequest;
-        private void RaiseHideRequest()
+         
+        private void OnSaveCommand()
         {
-            HideRequest?.Invoke(this, EventArgs.Empty);
+            UIApplication uiapp = _commandData.Application;
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
+            if (PickedObjects.Count == 0 || SelectedPipeSystem == null)
+                return;
+
+            using (Transaction ts = new Transaction(doc, "Set system type"))
+            {
+                ts.Start();
+                foreach (var pickedObject in PickedObjects)
+                {
+                    if(pickedObject is Pipe)
+                    {
+                        var oPipe = pickedObject as Pipe;
+                        oPipe.SetSystemType(SelectedPipeSystem.Id);
+                    }
+                }
+                ts.Commit();
+            }
         }
 
-
-        public event EventHandler ShowRequest;
-        private void RaiseShowRequest()
+        public event EventHandler CloseRequest;
+        private void RaiseCloseRequest()
         {
-            ShowRequest?.Invoke(this, EventArgs.Empty);
+            CloseRequest?.Invoke(this, EventArgs.Empty);
         }
-
-        private void OnSelectCommand()
-        {
-            RaiseHideRequest();
-            Element oElement = SelectionUtils.PickObjects(_commandData);
-            TaskDialog.Show("Сообщение", $"ID: {oElement.Id}");
-
-            RaiseShowRequest();
-        }
-
     }
 }
