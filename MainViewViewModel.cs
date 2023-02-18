@@ -38,7 +38,7 @@ namespace RevitAPITrainingUI
         private void OnSelectCommand()
         {
             RaiseHideRequest();
-            Element oElement = SelectionUtils.PickObjects(_commandData);
+            Element oElement = SelectionUtils.PickObject(_commandData);
             TaskDialog.Show("Сообщение", $"ID: {oElement.Id}");
 
             RaiseShowRequest();
