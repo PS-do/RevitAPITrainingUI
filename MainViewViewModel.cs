@@ -25,8 +25,7 @@ namespace RevitAPITrainingUI
             _commandData = commandData;
             SaveCommand = new DelegateCommand(OnSaveCommand);
             PickedObjects = SelectionUtils.PickObjects(commandData);
-            PipeSystems = PipesUtils.GetPipeSystems(commandData);
-            
+            PipeSystems = PipesUtils.GetPipeSystems(commandData);            
         }
          
         private void OnSaveCommand()
